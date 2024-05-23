@@ -25,7 +25,17 @@
         android:textSize="32sp"
         android:layout_marginBottom="100dp"
         android:textAllCaps="true"/>
-    
+
+    <ProgressBar
+        android:id="@+id/loader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:translationZ="1dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:indeterminateTint="@color/orange"/>
+
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -63,13 +73,14 @@
                 android:inputType="textEmailAddress"/>
 
             <com.noir.storyapp.customview.CustomPasswordET
-                android:id="@+id/ed_register_name"
+                android:id="@+id/ed_login_password"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="10dp"
                 android:inputType="textPassword"/>
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_login"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:text="@string/login"
@@ -101,6 +112,7 @@
                     style="@style/poppinsRegular"/>
 
                 <TextView
+                    android:id="@+id/tv_signup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/sign_up"

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.signup.SignUpActivity"
+    android:backgroundTint="@color/pastelOrange"
+    app:cardCornerRadius="0dp">
+    
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:contentDescription="@string/signup_art"
+        android:src="@drawable/signupart"
+        android:layout_gravity="center|top"
+        android:layout_marginTop="60dp"/>
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/create_your_account"
+        style="@style/poppinsBold"
+        android:textSize="24sp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="150dp"/>
+
+    <ProgressBar
+        android:id="@+id/loader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:translationZ="1dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:indeterminateTint="@color/orange"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:paddingHorizontal="15dp"
+        android:layout_marginTop="50dp">
+
+        <com.noir.storyapp.customview.CustomNameET
+            android:id="@+id/ed_register_name"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:backgroundTint="@color/white"
+            android:inputType="text"
+            android:maxLines="1"/>
+
+        <com.noir.storyapp.customview.CustomEmailET
+            android:id="@+id/ed_register_email"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:backgroundTint="@color/white"
+            android:layout_marginTop="10dp"
+            android:inputType="textEmailAddress"/>
+
+        <com.noir.storyapp.customview.CustomPasswordET
+            android:id="@+id/ed_register_password"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:backgroundTint="@color/white"
+            android:layout_marginTop="10dp"
+            android:inputType="textPassword"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_signup"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="@string/create_account"
+            style="@style/poppinsBold"
+            android:backgroundTint="@color/orange"
+            android:textAllCaps="false"
+            app:cornerRadius="10dp"
+            android:outlineSpotShadowColor="@color/transparent"
+            android:layout_marginVertical="10dp"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:layout_marginBottom="30dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/already_have_an_account"
+                style="@style/poppinsRegular"/>
+
+            <TextView
+                android:id="@+id/tv_signin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sign_in"
+                style="@style/poppinsBold"
+                android:layout_marginStart="1dp"/>
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

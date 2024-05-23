@@ -15,12 +15,11 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
 import com.noir.storyapp.R
 
-class CustomPasswordET @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : AppCompatEditText(context, attrs), View.OnTouchListener {
-    private var passwordIcon: Drawable? = null
-    private val warningIcon: Drawable = ContextCompat.getDrawable(context, R.drawable.ic_warning) as Drawable
+class CustomNameET @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : AppCompatEditText(context, attrs), View.OnTouchListener {
+    private var personIcon: Drawable? = null
 
     init {
-        passwordIcon = ContextCompat.getDrawable(context, R.drawable.ic_lock) as Drawable
+        personIcon = ContextCompat.getDrawable(context, R.drawable.ic_mail) as Drawable
         setOnTouchListener(this)
 
         addTextChangedListener(object : TextWatcher {
@@ -29,11 +28,7 @@ class CustomPasswordET @JvmOverloads constructor(context: Context, attrs: Attrib
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.toString().length < 8) {
-                    setError("Password tidak boleh kurang dari 8 karakter", warningIcon)
-                } else {
-                    error = null
-                }
+
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -49,7 +44,7 @@ class CustomPasswordET @JvmOverloads constructor(context: Context, attrs: Attrib
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        hint = "Password"
+        hint = "Name"
         textAlignment = View.TEXT_ALIGNMENT_VIEW_START
         compoundDrawablePadding = 50
         setHintTextColor(ContextCompat.getColor(context, R.color.purple))
@@ -61,7 +56,7 @@ class CustomPasswordET @JvmOverloads constructor(context: Context, attrs: Attrib
     }
 
     private fun showDrawables() {
-        setButtonDrawables(startOfTheText = passwordIcon)
+        setButtonDrawables(startOfTheText = personIcon)
     }
 
     private fun setCornerRadius(cornerRadius: Float) {
@@ -80,7 +75,6 @@ class CustomPasswordET @JvmOverloads constructor(context: Context, attrs: Attrib
         shapeDrawable.paint.color = ContextCompat.getColor(context, R.color.pastelOrange)
         background = shapeDrawable
     }
-
 
     private fun setButtonDrawables(
         startOfTheText: Drawable? = null,

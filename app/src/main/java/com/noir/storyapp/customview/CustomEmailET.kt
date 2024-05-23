@@ -16,7 +16,8 @@ import androidx.core.content.ContextCompat
 import com.noir.storyapp.R
 
 class CustomEmailET @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : AppCompatEditText(context, attrs), View.OnTouchListener {
-    private var emailIcon: Drawable
+    private var emailIcon: Drawable? = null
+    private val warningIcon: Drawable = ContextCompat.getDrawable(context, R.drawable.ic_warning) as Drawable
 
     init {
         emailIcon = ContextCompat.getDrawable(context, R.drawable.ic_mail) as Drawable
@@ -28,7 +29,11 @@ class CustomEmailET @JvmOverloads constructor(context: Context, attrs: Attribute
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
+                if (!s.toString().contains("@")) {
+                    setError("Format email salah", warningIcon)
+                } else {
+                    error = null
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -71,7 +76,6 @@ class CustomEmailET @JvmOverloads constructor(context: Context, attrs: Attribute
             null
         )
 
-        // Create a ShapeDrawable with the RoundRectShape and set it as the background
         val shapeDrawable = ShapeDrawable(roundRectShape)
         shapeDrawable.paint.color = ContextCompat.getColor(context, R.color.pastelOrange)
         background = shapeDrawable
