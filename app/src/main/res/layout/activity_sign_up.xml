@@ -27,16 +27,6 @@
         android:layout_gravity="center"
         android:layout_marginBottom="150dp"/>
 
-    <ProgressBar
-        android:id="@+id/loader"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:translationZ="1dp"
-        android:visibility="gone"
-        tools:visibility="visible"
-        android:indeterminateTint="@color/orange"/>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -69,17 +59,32 @@
             android:layout_marginTop="10dp"
             android:inputType="textPassword"/>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_signup"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="@string/create_account"
-            style="@style/poppinsBold"
-            android:backgroundTint="@color/orange"
-            android:textAllCaps="false"
-            app:cornerRadius="10dp"
-            android:outlineSpotShadowColor="@color/transparent"
-            android:layout_marginVertical="10dp"/>
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_signup"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="@string/create_account"
+                style="@style/poppinsBold"
+                android:backgroundTint="@color/orange"
+                android:textAllCaps="false"
+                app:cornerRadius="10dp"
+                android:outlineSpotShadowColor="@color/transparent"
+                android:layout_marginVertical="10dp"/>
+
+            <ProgressBar
+                android:id="@+id/loader"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:translationZ="5dp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:indeterminateTint="@color/pastelOrange"/>
+        </FrameLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"

@@ -19,7 +19,7 @@ class CustomNameET @JvmOverloads constructor(context: Context, attrs: AttributeS
     private var personIcon: Drawable? = null
 
     init {
-        personIcon = ContextCompat.getDrawable(context, R.drawable.ic_mail) as Drawable
+        personIcon = ContextCompat.getDrawable(context, R.drawable.ic_user_unfocused) as Drawable
         setOnTouchListener(this)
 
         addTextChangedListener(object : TextWatcher {
@@ -28,7 +28,11 @@ class CustomNameET @JvmOverloads constructor(context: Context, attrs: AttributeS
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
+                personIcon = if (s.toString().isNotEmpty()) {
+                    ContextCompat.getDrawable(context, R.drawable.ic_user) as Drawable
+                } else {
+                    ContextCompat.getDrawable(context, R.drawable.ic_user_unfocused) as Drawable
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -47,6 +51,7 @@ class CustomNameET @JvmOverloads constructor(context: Context, attrs: AttributeS
         hint = "Name"
         textAlignment = View.TEXT_ALIGNMENT_VIEW_START
         compoundDrawablePadding = 50
+        setPadding(50, 0, 0, 0)
         setHintTextColor(ContextCompat.getColor(context, R.color.purple))
         setTextColor(ContextCompat.getColor(context, R.color.orange))
         setBackgroundColor(ContextCompat.getColor(context, R.color.pastelOrange))

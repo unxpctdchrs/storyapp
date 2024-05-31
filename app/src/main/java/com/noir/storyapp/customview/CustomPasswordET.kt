@@ -20,7 +20,7 @@ class CustomPasswordET @JvmOverloads constructor(context: Context, attrs: Attrib
     private val warningIcon: Drawable = ContextCompat.getDrawable(context, R.drawable.ic_warning) as Drawable
 
     init {
-        passwordIcon = ContextCompat.getDrawable(context, R.drawable.ic_lock) as Drawable
+        passwordIcon = ContextCompat.getDrawable(context, R.drawable.ic_lock_unfocused) as Drawable
         setOnTouchListener(this)
 
         addTextChangedListener(object : TextWatcher {
@@ -29,10 +29,15 @@ class CustomPasswordET @JvmOverloads constructor(context: Context, attrs: Attrib
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.toString().length < 8) {
-                    setError("Password tidak boleh kurang dari 8 karakter", warningIcon)
+                if (s.toString().isNotEmpty()) {
+                    passwordIcon = ContextCompat.getDrawable(context, R.drawable.ic_lock) as Drawable
+                    if (s.toString().length < 8) {
+                        setError("Password tidak boleh kurang dari 8 karakter", warningIcon)
+                    } else {
+                        error = null
+                    }
                 } else {
-                    error = null
+                    passwordIcon = ContextCompat.getDrawable(context, R.drawable.ic_lock_unfocused) as Drawable
                 }
             }
 
@@ -52,6 +57,7 @@ class CustomPasswordET @JvmOverloads constructor(context: Context, attrs: Attrib
         hint = "Password"
         textAlignment = View.TEXT_ALIGNMENT_VIEW_START
         compoundDrawablePadding = 50
+        setPadding(50, 0, 50, 0)
         setHintTextColor(ContextCompat.getColor(context, R.color.purple))
         setTextColor(ContextCompat.getColor(context, R.color.orange))
         setBackgroundColor(ContextCompat.getColor(context, R.color.pastelOrange))

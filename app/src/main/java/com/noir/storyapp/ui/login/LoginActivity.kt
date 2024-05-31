@@ -2,9 +2,7 @@ package com.noir.storyapp.ui.login
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -42,17 +40,22 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.btnLogin.setOnClickListener {
-            loginViewModel.login(binding.edLoginEmail.text.toString().trim(), binding.edLoginPassword.text.toString().trim())
-
-            loginViewModel.login.observe(this) { user ->
-                if (!user.error && user.message == "success") {
-                    val userSave = UserModel(
-                        user.loginResult.userId,
-                        user.loginResult.name,
-                        user.loginResult.token,
-                        true
-                    )
-                    loginViewModel.saveSession(userSave)
+            if (binding.edLoginEmail.text.toString().trim().isEmpty()) {
+                binding.edLoginEmail.error = "Masukkan email anda"
+            } else if (binding.edLoginPassword.text.toString().trim().isEmpty()) {
+                binding.edLoginPassword.error = "Masukkan password anda"
+            } else {
+                loginViewModel.login(binding.edLoginEmail.text.toString().trim(), binding.edLoginPassword.text.toString().trim())
+                loginViewModel.login.observe(this) { user ->
+                    if (!user.error) {
+                        val userSave = UserModel(
+                            user.loginResult.userId,
+                            user.loginResult.name,
+                            user.loginResult.token,
+                            true
+                        )
+                        loginViewModel.saveSession(userSave)
+                    }
                 }
             }
         }
@@ -60,7 +63,6 @@ class LoginActivity : AppCompatActivity() {
         loginViewModel.getSession().observe(this) { user ->
             if (user.isLoggedIn) {
                 startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                 finish()
             }
         }
@@ -71,6 +73,12 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loaderState(isLoading: Boolean) {
-        if (isLoading) binding.loader.visibility = View.VISIBLE else binding.loader.visibility = View.GONE
+        if (isLoading) {
+            binding.btnLogin.text = ""
+            binding.loader.visibility = View.VISIBLE
+        } else {
+            binding.btnLogin.text = this@LoginActivity.resources.getString(R.string.login)
+            binding.loader.visibility = View.GONE
+        }
     }
 }

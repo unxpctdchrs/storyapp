@@ -7,7 +7,9 @@ import com.noir.storyapp.data.Repository
 import com.noir.storyapp.di.Injection
 import com.noir.storyapp.ui.login.LoginViewModel
 import com.noir.storyapp.ui.main.MainViewModel
+import com.noir.storyapp.ui.main.add.AddViewModel
 import com.noir.storyapp.ui.main.settings.SettingsViewModel
+import com.noir.storyapp.ui.main.stories.StoriesViewModel
 import com.noir.storyapp.ui.signup.SignUpViewModel
 
 class ViewModelFactory(private val repository: Repository) : ViewModelProvider.NewInstanceFactory() {
@@ -25,6 +27,12 @@ class ViewModelFactory(private val repository: Repository) : ViewModelProvider.N
             }
             modelClass.isAssignableFrom(SettingsViewModel::class.java) -> {
                 SettingsViewModel(repository) as T
+            }
+            modelClass.isAssignableFrom(StoriesViewModel::class.java) -> {
+                StoriesViewModel(repository) as T
+            }
+            modelClass.isAssignableFrom(AddViewModel::class.java) -> {
+                AddViewModel(repository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel Class: " + modelClass.name)
         }

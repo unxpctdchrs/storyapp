@@ -9,17 +9,41 @@
         android:id="@+id/navigation_stories"
         android:name="com.noir.storyapp.ui.main.stories.StoriesFragment"
         android:label="@string/title_stories"
-        tools:layout="@layout/fragment_stories" />
+        tools:layout="@layout/fragment_stories" >
+        <action
+            android:id="@+id/action_navigation_stories_to_detailStoriesFragment"
+            app:destination="@id/detailStoriesFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_add"
         android:name="com.noir.storyapp.ui.main.add.AddFragment"
         android:label="@string/title_add_story"
-        tools:layout="@layout/fragment_add" />
+        tools:layout="@layout/fragment_add" >
+        <action
+            android:id="@+id/action_navigation_add_to_navigation_stories"
+            app:destination="@id/navigation_stories" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_settings"
         android:name="com.noir.storyapp.ui.main.settings.SettingsFragment"
         android:label="@string/title_settings"
         tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/detailStoriesFragment"
+        android:name="com.noir.storyapp.ui.main.stories.detail.DetailStoriesFragment"
+        android:label="fragment_detail_stories"
+        tools:layout="@layout/fragment_detail_stories" >
+        <argument
+            android:name="image"
+            app:argType="string"
+            android:defaultValue="image" />
+        <argument
+            android:name="name"
+            android:defaultValue="name" />
+        <argument
+            android:name="description"
+            android:defaultValue="description" />
+    </fragment>
 </navigation>

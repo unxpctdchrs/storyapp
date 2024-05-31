@@ -39,18 +39,23 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         binding.btnSignup.setOnClickListener {
-            signUpViewModel.register(
-                binding.edRegisterName.text.toString().trim(),
-                binding.edRegisterEmail.text.toString().trim(),
-                binding.edRegisterPassword.text.toString().trim()
-            )
+            if (binding.edRegisterName.text.toString().trim().isEmpty()) {
+                binding.edRegisterName.error = "Masukkan nama anda"
+            } else if (binding.edRegisterEmail.text.toString().trim().isEmpty()) {
+                binding.edRegisterEmail.error = "Masukkan email anda"
+            } else if (binding.edRegisterPassword.text.toString().trim().isEmpty()) {
+                binding.edRegisterPassword.error = "Masukkan password anda"
+            } else {
+                signUpViewModel.register(
+                    binding.edRegisterName.text.toString().trim(),
+                    binding.edRegisterEmail.text.toString().trim(),
+                    binding.edRegisterPassword.text.toString().trim()
+                )
+            }
         }
 
         signUpViewModel.isLoading.observe(this) { isLoading ->
             loaderState(isLoading)
-            if (!isLoading) {
-                startActivity(Intent(this@SignUpActivity, LoginActivity::class.java))
-            }
         }
 
         signUpViewModel.register.observe(this) { register ->
@@ -58,11 +63,19 @@ class SignUpActivity : AppCompatActivity() {
                 Toast.makeText(this, register.message, Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, register.message, Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this@SignUpActivity, LoginActivity::class.java))
+                finish()
             }
         }
     }
 
     private fun loaderState(isLoading: Boolean) {
-        if (isLoading) binding.loader.visibility = View.VISIBLE else binding.loader.visibility = View.GONE
+        if (isLoading) {
+            binding.btnSignup.text = ""
+            binding.loader.visibility = View.VISIBLE
+        } else {
+            binding.btnSignup.text = this@SignUpActivity.resources.getString(R.string.create_account)
+            binding.loader.visibility = View.GONE
+        }
     }
 }

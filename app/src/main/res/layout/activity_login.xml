@@ -26,16 +26,6 @@
         android:layout_marginBottom="100dp"
         android:textAllCaps="true"/>
 
-    <ProgressBar
-        android:id="@+id/loader"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:translationZ="1dp"
-        android:visibility="gone"
-        tools:visibility="visible"
-        android:indeterminateTint="@color/orange"/>
-
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -79,17 +69,34 @@
                 android:layout_marginTop="10dp"
                 android:inputType="textPassword"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_login"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:text="@string/login"
-                style="@style/poppinsBold"
-                android:backgroundTint="@color/orange"
-                android:textAllCaps="false"
-                app:cornerRadius="10dp"
-                android:outlineSpotShadowColor="@color/transparent"
-                android:layout_marginVertical="10dp"/>
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_login"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:text="@string/login"
+                    style="@style/poppinsBold"
+                    android:backgroundTint="@color/orange"
+                    android:textAllCaps="false"
+                    app:cornerRadius="10dp"
+                    android:outlineSpotShadowColor="@color/transparent"
+                    android:layout_marginVertical="10dp"/>
+
+                <ProgressBar
+                    android:id="@+id/loader"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    android:translationZ="5dp"
+                    android:indeterminateTint="@color/pastelOrange"/>
+
+            </FrameLayout>
+
 
             <TextView
                 android:layout_width="wrap_content"

@@ -1,20 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.main.stories.StoriesFragment"
-    android:background="@color/pastelOrange">
+    android:backgroundTint="@color/pastelOrange"
+    app:cardCornerRadius="0dp">
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="550dp"
         android:src="@drawable/main_background"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_gravity="center|bottom"/>
+
+    <ProgressBar
+        android:id="@+id/loader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:translationZ="1dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:indeterminateTint="@color/orange"/>
+
+    <TextView
+        android:id="@+id/tv_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/poppinsBold"
+        android:layout_gravity="center"
+        android:translationZ="1dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:ems="10"
+        android:gravity="center"
+        android:text="@string/error"/>
+
+    <TextView
+        android:id="@+id/tv_noData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/poppinsBold"
+        android:layout_gravity="center"
+        android:translationZ="1dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:text="@string/no_data"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/stories"
+        style="@style/poppinsSemiBold"
+        android:textSize="18sp"
+        android:layout_gravity="center|top"
+        android:layout_marginTop="20dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="80dp"
+        android:layout_marginTop="60dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_stories"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/story_layout"/>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

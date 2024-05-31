@@ -9,6 +9,7 @@ import android.graphics.drawable.shapes.RoundRectShape
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
+import android.util.Patterns
 import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.widget.AppCompatEditText
@@ -20,7 +21,7 @@ class CustomEmailET @JvmOverloads constructor(context: Context, attrs: Attribute
     private val warningIcon: Drawable = ContextCompat.getDrawable(context, R.drawable.ic_warning) as Drawable
 
     init {
-        emailIcon = ContextCompat.getDrawable(context, R.drawable.ic_mail) as Drawable
+        emailIcon = ContextCompat.getDrawable(context, R.drawable.ic_mail_unfocused) as Drawable
         setOnTouchListener(this)
 
         addTextChangedListener(object : TextWatcher {
@@ -29,10 +30,15 @@ class CustomEmailET @JvmOverloads constructor(context: Context, attrs: Attribute
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (!s.toString().contains("@")) {
-                    setError("Format email salah", warningIcon)
+                if (s.toString().isNotEmpty()){
+                    emailIcon = ContextCompat.getDrawable(context, R.drawable.ic_mail) as Drawable
+                    if (!Patterns.EMAIL_ADDRESS.matcher(s.toString()).matches()) {
+                        setError("Format email salah", warningIcon)
+                    } else {
+                        error = null
+                    }
                 } else {
-                    error = null
+                    emailIcon = ContextCompat.getDrawable(context, R.drawable.ic_mail_unfocused) as Drawable
                 }
             }
 
@@ -52,6 +58,7 @@ class CustomEmailET @JvmOverloads constructor(context: Context, attrs: Attribute
         hint = "Email"
         textAlignment = View.TEXT_ALIGNMENT_VIEW_START
         compoundDrawablePadding = 50
+        setPadding(50, 0, 0, 0)
         setHintTextColor(ContextCompat.getColor(context, R.color.purple))
         setTextColor(ContextCompat.getColor(context, R.color.orange))
         setBackgroundColor(ContextCompat.getColor(context, R.color.pastelOrange))

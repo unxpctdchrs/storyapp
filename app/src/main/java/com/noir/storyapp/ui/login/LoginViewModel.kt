@@ -10,8 +10,8 @@ import com.noir.storyapp.data.remote.response.LoginResponse
 import kotlinx.coroutines.launch
 
 class LoginViewModel(private val repository: Repository) : ViewModel() {
+    val login: LiveData<LoginResponse> = repository.login
     val isLoading: LiveData<Boolean> = repository.isLoading
-    var login: LiveData<LoginResponse> = repository.login
 
     fun login(email: String, password: String) = repository.login(email, password)
 
