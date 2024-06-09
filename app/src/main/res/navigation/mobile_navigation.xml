@@ -13,6 +13,10 @@
         <action
             android:id="@+id/action_navigation_stories_to_detailStoriesFragment"
             app:destination="@id/detailStoriesFragment" />
+        <argument
+            android:name="scroll"
+            app:argType="boolean"
+            android:defaultValue="true" />
     </fragment>
 
     <fragment
@@ -46,4 +50,14 @@
             android:name="description"
             android:defaultValue="description" />
     </fragment>
+    <fragment
+        android:id="@+id/navigation_add_friends"
+        android:name="com.noir.storyapp.ui.main.addFriends.AddFriendsFragment"
+        android:label="fragment_add_friends"
+        tools:layout="@layout/fragment_add_friends" />
+    <fragment
+        android:id="@+id/navigation_locations"
+        android:name="com.noir.storyapp.ui.main.locations.LocationsFragment"
+        android:label="fragment_locations"
+        tools:layout="@layout/fragment_locations" />
 </navigation>

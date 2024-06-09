@@ -1,17 +1,23 @@
 package com.noir.storyapp.ui.main.stories
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.noir.storyapp.R
+import com.noir.storyapp.adapters.LoadingStateAdapter
 import com.noir.storyapp.adapters.StoryAdapter
-import com.noir.storyapp.data.remote.response.StoriesResponse
 import com.noir.storyapp.databinding.FragmentStoriesBinding
 import com.noir.storyapp.helper.ViewModelFactory
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class StoriesFragment : Fragment() {
     private var _binding: FragmentStoriesBinding? = null
@@ -19,15 +25,6 @@ class StoriesFragment : Fragment() {
 
     private val storiesViewModel by viewModels<StoriesViewModel> {
         ViewModelFactory.getInstance(requireContext())
-    }
-
-    override fun onResume() {
-        super.onResume()
-        storiesViewModel.getSession().observe(viewLifecycleOwner) { user ->
-            if (user.isLoggedIn && user.token.isNotEmpty()) {
-                storiesViewModel.getStories(user.token)
-            }
-        }
     }
 
     override fun onCreateView(
@@ -42,17 +39,16 @@ class StoriesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        storiesViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            loaderState(isLoading)
+        populateStories()
+
+        storiesViewModel.hasScrolledToTop.observe(viewLifecycleOwner) { hasScrolled ->
+            Log.d("hasScrolledToTop", hasScrolled.toString())
         }
 
-        storiesViewModel.stories.observe(viewLifecycleOwner) { stories ->
-            if (stories.listStory.isEmpty()) {
-                binding?.tvNoData?.visibility = View.VISIBLE
-            } else {
-                binding?.tvNoData?.visibility = View.GONE
-                populateStories(stories)
-            }
+        binding?.swipeRefreshLayout?.setOnRefreshListener {
+            binding?.swipeRefreshLayout?.isRefreshing = true
+            storiesViewModel.refreshStories()
+            binding?.swipeRefreshLayout?.isRefreshing = false
         }
 
         storiesViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
@@ -63,15 +59,39 @@ class StoriesFragment : Fragment() {
         }
     }
 
-    private fun populateStories(stories: StoriesResponse) {
-        val adapter = StoryAdapter()
-        adapter.submitList(stories.listStory)
-        binding?.rvStories?.adapter = adapter
+    private fun populateStories() {
         binding?.rvStories?.layoutManager = LinearLayoutManager(requireContext())
-    }
+        val adapter = StoryAdapter()
+        binding?.rvStories?.adapter = adapter.withLoadStateFooter(
+            footer = LoadingStateAdapter {
+                adapter.retry()
+            }
+        )
 
-    private fun loaderState(isLoading: Boolean) {
-        if (isLoading) binding?.loader?.visibility = View.VISIBLE else binding?.loader?.visibility = View.GONE
+        lifecycleScope.launch {
+            adapter.loadStateFlow.collectLatest {
+                binding?.loader?.isVisible = (it.refresh is LoadState.Loading) || (it.append is LoadState.Loading)
+
+                val isLoading = it.refresh is LoadState.Loading ||
+                        it.append is LoadState.Loading ||
+                        it.prepend is LoadState.Loading
+
+                if (!isLoading && storiesViewModel.hasScrolledToTop.value == false) {
+                    binding?.rvStories?.scrollToPosition(0)
+                    storiesViewModel.hasScrolledToTop.value = true
+                }
+            }
+        }
+
+        storiesViewModel.stories.observe(viewLifecycleOwner) {
+            adapter.submitData(lifecycle, it)
+
+            if (adapter.itemCount <= 0) {
+                binding?.tvNoData?.visibility = View.VISIBLE
+            } else {
+                binding?.tvNoData?.visibility = View.GONE
+            }
+        }
     }
 
     override fun onDestroyView() {

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.noir.storyapp.data.Repository
-import com.noir.storyapp.data.pref.UserModel
+import com.noir.storyapp.data.local.pref.UserModel
 import com.noir.storyapp.data.remote.response.LoginResponse
 import kotlinx.coroutines.launch
 

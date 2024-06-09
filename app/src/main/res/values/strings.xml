@@ -31,4 +31,14 @@
     <string name="error" translatable="false">Error: %s. This is a bug that I don\'t know where the problem is, Please reopen the app. Sorry for the inconvenience</string>
     <string name="no_data">No Data</string>
     <string name="change_language">Change Language</string>
+    <string name="title_add_friends">Add Friends</string>
+    <string name="title_locations">Locations</string>
+    <string name="find_friends">Find Friends</string>
+    <string name="on_construction">On Construction 🛠️</string>
+    <string name="stories_locations">Stories Locations</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="send_loc_data">Send Location Data</string>
+    <string name="do_not_send_loc_data">Do Not Send Location Data</string>
+    <string name="retry">Retry</string>
 </resources>

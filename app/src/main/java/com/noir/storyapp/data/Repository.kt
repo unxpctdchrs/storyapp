@@ -3,14 +3,23 @@ package com.noir.storyapp.data
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.noir.storyapp.data.pref.UserModel
-import com.noir.storyapp.data.pref.UserPreference
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.liveData
+import com.noir.storyapp.data.local.database.StoriesDatabase
+import com.noir.storyapp.data.local.pref.UserModel
+import com.noir.storyapp.data.local.pref.UserPreference
 import com.noir.storyapp.data.remote.response.AddStoryResponse
 import com.noir.storyapp.data.remote.response.Error
+import com.noir.storyapp.data.remote.response.ListStoryItem
 import com.noir.storyapp.data.remote.response.LoginResponse
 import com.noir.storyapp.data.remote.response.RegisterResponse
+import com.noir.storyapp.data.remote.StoriesRemoteMediator
 import com.noir.storyapp.data.remote.response.StoriesResponse
 import com.noir.storyapp.data.remote.retrofit.APIService
+import com.noir.storyapp.helper.wrapEspressoIdlingResource
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -18,7 +27,12 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class Repository private constructor(private val apiService: APIService, private val userPreference: UserPreference) {
+class Repository private constructor(
+    private val apiService: APIService,
+    private val userPreference: UserPreference,
+    private val storiesDatabase: StoriesDatabase
+) {
+
     private val _register = MutableLiveData<RegisterResponse>()
     val register: LiveData<RegisterResponse> = _register
 
@@ -33,9 +47,6 @@ class Repository private constructor(private val apiService: APIService, private
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
-
-    private val _storyIsLoading = MutableLiveData<Boolean>()
-    val storyIsLoading: LiveData<Boolean> = _storyIsLoading
 
     private val _addStoryLoading = MutableLiveData<Boolean>()
     val addStoryLoading: LiveData<Boolean> = _addStoryLoading
@@ -98,53 +109,44 @@ class Repository private constructor(private val apiService: APIService, private
         })
     }
 
-    fun getStories(token: String) {
-        _storyIsLoading.value = true
-        val client = apiService.getStories("Bearer $token")
-        client.enqueue(object : Callback<StoriesResponse> {
-            override fun onResponse(
-                call: Call<StoriesResponse>,
-                response: Response<StoriesResponse>
-            ) {
-                _storyIsLoading.value = false
-                if (response.isSuccessful) {
-                    _stories.value = response.body()
-                } else {
-                    if (response.code() == 401) {
-                        _errorMessage.value = Error(401, response.message())
-                    }
-                    Log.e(TAG, "onFailure: ${response.message()}")
-                }
+    fun getStories(token: String) : LiveData<PagingData<ListStoryItem>> {
+        @OptIn(ExperimentalPagingApi::class)
+        return Pager(
+            config = PagingConfig(
+                pageSize = 5
+            ),
+            remoteMediator = StoriesRemoteMediator(token = token, storiesDatabase = storiesDatabase, apiService = apiService),
+            pagingSourceFactory = {
+                storiesDatabase.storiesDAO().getStories()
             }
-
-            override fun onFailure(call: Call<StoriesResponse>, t: Throwable) {
-                _storyIsLoading.value = false
-                Log.e(TAG, "onFailure: ${t.message.toString()}")
-            }
-        })
+        ).liveData
     }
 
-    fun uploadStory(token: String, file: MultipartBody.Part, description: RequestBody) {
-        _addStoryLoading.value = true
-        val client = apiService.uploadStory("Bearer $token", file, description)
-        client.enqueue(object : Callback<AddStoryResponse> {
-            override fun onResponse(
-                call: Call<AddStoryResponse>,
-                response: Response<AddStoryResponse>
-            ) {
-                _addStoryLoading.value = false
-                if (response.isSuccessful) {
-                    _addStory.value = response.body()
-                } else {
-                    Log.e(TAG, "onFailure: ${response.message()}")
-                }
-            }
+    fun getStoriesForMap(): LiveData<List<ListStoryItem>> = storiesDatabase.storiesDAO().getStoriesForMap()
 
-            override fun onFailure(call: Call<AddStoryResponse>, t: Throwable) {
-                _addStoryLoading.value = false
-                Log.e(TAG, "onFailure: ${t.message.toString()}")
-            }
-        })
+    fun uploadStory(token: String, file: MultipartBody.Part, description: RequestBody, lat: RequestBody? = null, lon: RequestBody? = null) {
+        wrapEspressoIdlingResource {
+            _addStoryLoading.value = true
+            val client = apiService.uploadStory("Bearer $token", file, description, lat, lon)
+            client.enqueue(object : Callback<AddStoryResponse> {
+                override fun onResponse(
+                    call: Call<AddStoryResponse>,
+                    response: Response<AddStoryResponse>
+                ) {
+                    _addStoryLoading.value = false
+                    if (response.isSuccessful) {
+                        _addStory.value = response.body()
+                    } else {
+                        Log.e(TAG, "onFailure: ${response.message()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<AddStoryResponse>, t: Throwable) {
+                    _addStoryLoading.value = false
+                    Log.e(TAG, "onFailure: ${t.message.toString()}")
+                }
+            })
+        }
     }
 
     companion object {
@@ -153,9 +155,9 @@ class Repository private constructor(private val apiService: APIService, private
         @Volatile
         private var instance: Repository? = null
 
-        fun getInstance(apiService: APIService, userPreference: UserPreference) : Repository = instance ?: synchronized(this) {
+        fun getInstance(apiService: APIService, userPreference: UserPreference, storiesDatabase: StoriesDatabase) : Repository = instance ?: synchronized(this) {
             instance ?: synchronized(this) {
-                instance ?: Repository(apiService, userPreference)
+                instance ?: Repository(apiService, userPreference, storiesDatabase)
             }.also { instance = it }
         }
     }

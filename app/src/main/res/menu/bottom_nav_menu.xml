@@ -7,9 +7,19 @@
         android:title="@string/title_stories" />
 
     <item
+        android:id="@+id/navigation_add_friends"
+        android:icon="@drawable/ic_add_friends"
+        android:title="@string/title_add_friends"/>
+
+    <item
         android:id="@+id/navigation_add"
         android:icon="@drawable/ic_add"
         android:title="@string/title_add_story" />
+
+    <item
+        android:id="@+id/navigation_locations"
+        android:icon="@drawable/ic_location"
+        android:title="@string/title_locations"/>
 
     <item
         android:id="@+id/navigation_settings"

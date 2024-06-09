@@ -17,4 +17,14 @@
     <string name="upload">Unggah</string>
     <string name="no_data">Tidak Ada Data</string>
     <string name="change_language">Ganti Bahasa</string>
+    <string name="title_add_friends">Tambah Teman</string>
+    <string name="title_locations">Lokasi</string>
+    <string name="find_friends">Cari Teman</string>
+    <string name="on_construction">Dalam Pengerjaan 🛠️</string>
+    <string name="stories_locations">Lokasi Story</string>
+    <string name="yes">Ya</string>
+    <string name="no">Tidak</string>
+    <string name="send_loc_data">Kirim Data Lokasi</string>
+    <string name="do_not_send_loc_data">Jangan Kirim Data Lokasi</string>
+    <string name="retry">Coba Lagi</string>
 </resources>

@@ -6,15 +6,15 @@ import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.noir.storyapp.data.remote.response.ListStoryItem
 import com.noir.storyapp.databinding.StoryLayoutBinding
 import com.noir.storyapp.ui.main.stories.StoriesFragmentDirections
 
-class StoryAdapter() : ListAdapter<ListStoryItem, StoryAdapter.ViewHolder>(DIFF_CALLBACK) {
+class StoryAdapter : PagingDataAdapter<ListStoryItem, StoryAdapter.ViewHolder>(DIFF_CALLBACK) {
     inner class ViewHolder(private val binding: StoryLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(story: ListStoryItem) {
             ViewCompat.setTransitionName(binding.ivItemPhoto, story.photoUrl)
@@ -50,7 +50,9 @@ class StoryAdapter() : ListAdapter<ListStoryItem, StoryAdapter.ViewHolder>(DIFF_
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val story = getItem(position)
-        holder.bind(story)
+        if (story != null) {
+            holder.bind(story)
+        }
     }
 
     companion object {

@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.noir.storyapp.R
-import com.noir.storyapp.data.pref.UserModel
+import com.noir.storyapp.data.local.pref.UserModel
 import com.noir.storyapp.databinding.ActivityLoginBinding
 import com.noir.storyapp.helper.ViewModelFactory
 import com.noir.storyapp.ui.main.MainActivity

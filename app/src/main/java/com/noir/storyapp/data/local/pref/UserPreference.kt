@@ -1,4 +1,4 @@
-package com.noir.storyapp.data.pref
+package com.noir.storyapp.data.local.pref
 
 import android.content.Context
 import androidx.datastore.core.DataStore

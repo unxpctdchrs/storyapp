@@ -2,6 +2,7 @@ package com.noir.storyapp.ui.main.add
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -17,12 +18,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.transition.Slide
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.noir.storyapp.R
 import com.noir.storyapp.databinding.FragmentAddBinding
 import com.noir.storyapp.helper.Utils.getImageUri
 import com.noir.storyapp.helper.Utils.reduceFileImage
 import com.noir.storyapp.helper.Utils.uriToFile
 import com.noir.storyapp.helper.ViewModelFactory
+import com.noir.storyapp.ui.main.stories.StoriesViewModel
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -33,24 +37,49 @@ class AddFragment : Fragment() {
     private val binding get() = _binding
 
     private var currentImageUri: Uri? = null
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var myLocation: Location
+    private var selectedLocationState = false
+    private var sendLocationIsChecked = false
+    private var doNotSendLocationIsChecked = false
 
     private val addViewModel by viewModels<AddViewModel> {
         ViewModelFactory.getInstance(requireContext())
     }
 
-    private fun allPermissionsGranted() = ContextCompat.checkSelfPermission(requireContext(), REQUIRED_PERMISSION) == PackageManager.PERMISSION_GRANTED
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-        if (isGranted) {
-            Toast.makeText(requireContext(), "Permission request granted", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(requireContext(), "Permission request denied", Toast.LENGTH_SHORT).show()
+    private val storiesViewModel by viewModels<StoriesViewModel> {
+        ViewModelFactory.getInstance(requireContext())
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+        when {
+            permissions[Manifest.permission.CAMERA] ?: false -> {
+                Toast.makeText(requireContext(), "Permission request granted", Toast.LENGTH_SHORT).show()
+            }
+            permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> {
+                // Precise location access granted
+                getMyLastLocation()
+            }
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> {
+                // Only approximate location access granted
+                getMyLastLocation()
+            }
+            else -> {
+                Toast.makeText(requireContext(), "Permission request denied", Toast.LENGTH_SHORT).show()
+            }
         }
+    }
+
+    private fun checkPermission(permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enterTransition = Slide(Gravity.BOTTOM)
         exitTransition = Slide(Gravity.TOP)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
     }
 
     override fun onCreateView(
@@ -80,9 +109,7 @@ class AddFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (!allPermissionsGranted()) {
-            requestPermissionLauncher.launch(REQUIRED_PERMISSION)
-        }
+        getMyLastLocation()
 
         binding?.btnGallery?.setOnClickListener {
             launchGallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
@@ -94,26 +121,39 @@ class AddFragment : Fragment() {
         }
 
         binding?.buttonAdd?.setOnClickListener {
-            if (binding?.edtDescription?.text.toString().isEmpty()) {
-                binding?.edtDescription?.error = "Silahkan masukkan deskripsi terlebih dahulu"
-            } else if (currentImageUri == null) {
+            if (currentImageUri == null) {
                 Toast.makeText(requireContext(), "Masukkan gambar terlebih dahulu", Toast.LENGTH_SHORT).show()
+            } else if (binding?.edtDescription?.text.toString().isEmpty()) {
+                binding?.edtDescription?.error = "Silahkan masukkan deskripsi terlebih dahulu"
+            } else if (!binding?.radioSendLoc?.isChecked!! && !binding?.radioDontSendLoc?.isChecked!!) {
+                Toast.makeText(requireContext(), "Silahkan pilih apakah lokasi anda mau dikirim juga?", Toast.LENGTH_SHORT).show()
             }
             else {
+                getMyLastLocation()
                 uploadStory()
-                addViewModel.uploadStory.observe(viewLifecycleOwner) { story ->
-                    if (story.error) {
-                        Toast.makeText(requireContext(), "Gagal Upload Story", Toast.LENGTH_SHORT).show()
-                    } else {
-                        val toStoriesFragment = AddFragmentDirections.actionNavigationAddToNavigationStories()
-                        findNavController().navigate(toStoriesFragment)
-                    }
-                }
+                Log.d(TAG, selectedLocationState.toString())
             }
         }
 
         addViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             loaderState(isLoading)
+        }
+    }
+
+    private fun getMyLastLocation() {
+        if (checkPermission(Manifest.permission.CAMERA) && checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) && checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    myLocation = location
+                    Log.d("My Location: ", "${myLocation.latitude}, ${myLocation.longitude}")
+                }
+            }
+        } else {
+            requestPermissionLauncher.launch(arrayOf(
+                Manifest.permission.CAMERA,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ))
         }
     }
 
@@ -129,15 +169,48 @@ class AddFragment : Fragment() {
             Log.d("Image File", "showImage: ${imageFile.path}")
             val description = binding?.edtDescription?.text.toString()
 
-            val requestBody = description.toRequestBody("text/plain".toMediaType())
+            val descriptionRequestBody = description.toRequestBody("text/plain".toMediaType())
             val requestImageFile = imageFile.asRequestBody("image/jpeg".toMediaType())
             val multipartBody = MultipartBody.Part.createFormData(
                 "photo",
                 imageFile.name,
                 requestImageFile
             )
-            addViewModel.getSession().observe(viewLifecycleOwner) { user ->
-                addViewModel.uploadStory(user.token, multipartBody, requestBody)
+            val latRequestBody = myLocation.latitude.toString().toRequestBody("text/plain".toMediaType())
+            val lonRequestBody = myLocation.longitude.toString().toRequestBody("text/plain".toMediaType())
+
+            binding?.radioSendLoc?.setOnCheckedChangeListener { _, isChecked ->
+                sendLocationIsChecked = isChecked
+            }
+
+            binding?.radioDontSendLoc?.setOnCheckedChangeListener { _, isChecked ->
+                doNotSendLocationIsChecked = isChecked
+            }
+
+            if (sendLocationIsChecked) {
+                selectedLocationState = true
+            } else if (doNotSendLocationIsChecked) {
+                selectedLocationState = false
+            }
+
+            if (selectedLocationState) {
+                addViewModel.getSession().observe(viewLifecycleOwner) { user ->
+                    addViewModel.uploadStory(user.token, multipartBody, descriptionRequestBody, latRequestBody, lonRequestBody)
+                }
+            } else {
+                addViewModel.getSession().observe(viewLifecycleOwner) { user ->
+                    addViewModel.uploadStory(user.token, multipartBody, descriptionRequestBody)
+                }
+            }
+
+            addViewModel.uploadStory.observe(viewLifecycleOwner) { story ->
+                if (!story.error && story.message == "Story created successfully") {
+                    val toStoriesFragment = AddFragmentDirections.actionNavigationAddToNavigationStories()
+                    findNavController().navigate(toStoriesFragment)
+                    storiesViewModel.hasScrolledToTop.value = false
+                } else {
+                    Toast.makeText(requireContext(), "Gagal Upload Story", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -158,6 +231,6 @@ class AddFragment : Fragment() {
     }
 
     companion object {
-        private const val REQUIRED_PERMISSION = Manifest.permission.CAMERA
+        const val TAG = "AddFragment"
     }
 }
